@@ -1,0 +1,59 @@
+# 🔧 Fichiers système et IDE
+*.swp
+*.bak
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# 🐳 Docker
+*.tar
+*.img
+docker-compose.override.yml
+.env
+.env.local
+.env.*.local
+
+# 📦 Node / JS (si applicable)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 🧪 Minikube / Kubernetes
+.kube/
+minikube/
+*.crt
+*.key
+
+# 📂 Cockpit HTMLs (si générés dynamiquement)
+cockpit/generated/
+cockpit/cache/
+cockpit/tmp/
+
+# 🧾 MongoDB dumps
+dump/
+*.bson
+*.json
+
+# 🔐 Sécurité
+secrets/
+*.pem
+*.key
+*.crt
+
+# 🧼 Nettoyage
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+
+# 📸 Screenshots ou docs temporaires
+screenshots/
+notes/
+*.png
+*.jpg
