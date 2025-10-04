@@ -36,8 +36,10 @@ git status
 
 # 🆕 Créer une nouvelle branche
 read -p "🌿 Nom de la nouvelle branche : " new_branch
-git checkout -b "$new_branch"
-echo "✅ Branche '$new_branch' créée et activée"
+# Remplacer les espaces par des tirets
+new_branch_safe=$(echo "$new_branch" | tr ' ' '-')
+git checkout -b "$new_branch_safe"
+echo "✅ Branche '$new_branch_safe' créée et activée"
 echo "───────────────────────────────────────────────"
 
 # 🧾 Ajouter les fichiers non suivis
@@ -48,9 +50,26 @@ if [[ "$add_files" == "y" ]]; then
   git add .
   read -p "📝 Message du commit : " commit_msg
   git commit -m "$commit_msg"
-  echo "✅ Commit effectué sur '$new_branch'"
+  echo "✅ Commit effectué sur '$new_branch_safe'"
   echo "───────────────────────────────────────────────"
 fi
 
 # 🌳 Visualisation après commit
-echo
+echo "🌳 Arbre Git après commit"
+git log --pretty=oneline --graph --decorate --all
+echo "───────────────────────────────────────────────"
+
+# 📤 Pousser la branche
+read -p "📤 Pousser la branche sur GitHub ? (y/n) " push_branch
+if [[ "$push_branch" == "y" ]]; then
+  git push -u origin "$new_branch_safe"
+  echo "✅ Branche '$new_branch_safe' poussée vers GitHub"
+  echo "🌳 Arbre Git après push"
+  git log --pretty=oneline --graph --decorate --all
+  echo "───────────────────────────────────────────────"
+fi
+
+# 🌳 Log final cockpit
+echo "🌳 Arbre Git final — validation cockpit"
+git log --pretty=oneline --graph --decorate --all
+echo "✅ Cycle terminé — commit propre sur '$new_branch_safe'"
