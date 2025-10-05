@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nana-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nana-api
+  template:
+    metadata:
+      labels:
+        app: nana-api
+    spec:
+      containers:
+        - name: nana-api
+          image: nana-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_URI
+              value: mongodb://nana-mongodb:27017/nana

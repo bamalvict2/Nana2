@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nana-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nana-api
+  template:
+    metadata:
+      labels:
+        app: nana-api
+    spec:
+      containers:
+        - name: nana-api
+          image: bamalvict603/nana-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_URI
+              value: mongodb://nana-mongodb:27017/nana
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"

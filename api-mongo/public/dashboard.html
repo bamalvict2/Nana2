@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Liste des rappels</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #rappels {
+      margin-bottom: 20px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📋 Vos rappels</h1>
+  <div id="rappels">Chargement...</div>
+
+  <button onclick="window.location.href='index.html'">⬅️ Retour au menu</button>
+
+  <script>
+    const token = localStorage.getItem('token');
+
+    fetch('/rappels', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('rappels');
+      if (data.length === 0) {
+        container.textContent = 'Aucun rappel trouvé.';
+        return;
+      }
+      container.innerHTML = '<ul>' + data.map(r => `<li>${r.titre || 'Sans titre'} — ${r.date || 'Date inconnue'}</li>`).join('') + '</ul>';
+    })
+    .catch(err => {
+      document.getElementById('rappels').textContent = 'Erreur de chargement ❌';
+      console.error(err);
+    });
+  </script>
+
+</body>
+</html>

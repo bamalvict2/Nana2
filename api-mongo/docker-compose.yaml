@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  nana-mongodb:
+    image: mongo
+    container_name: nana-mongodb
+    ports:
+      - "30017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+    env_file:
+      - ./api-mongo/.env
+
+  mongo-express:
+    image: mongo-express
+    container_name: nana-mongo-express
+    ports:
+      - "8090:8081"
+    env_file:
+      - ./api-mongo/.env
+    environment:
+      ME_CONFIG_MONGODB_SERVER: nana-mongodb
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ADMIN_USER}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ADMIN_PASS}
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGOEXPRESS_USER}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGOEXPRESS_PASS}
+    depends_on:
+      - nana-mongodb
+    restart: unless-stopped
+
+  api:
+    build: ./api-mongo
+    container_name: nana-api
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./api-mongo/.env
+    depends_on:
+      - nana-mongodb
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

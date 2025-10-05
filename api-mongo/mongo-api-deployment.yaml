@@ -1,0 +1,100 @@
+# MongoDB Persistent Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+# MongoDB Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:latest
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db
+      volumes:
+        - name: mongo-storage
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+
+---
+
+# MongoDB Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+spec:
+  selector:
+    app: mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP
+
+---
+
+# nana-api Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nana-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nana-api
+  template:
+    metadata:
+      labels:
+        app: nana-api
+    spec:
+      containers:
+        - name: nana-api
+          image: nana-api:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_URL
+              value: mongodb://mongo-service:27017
+
+---
+
+# nana-api Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nana-api-service
+spec:
+  selector:
+    app: nana-api
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: NodePort

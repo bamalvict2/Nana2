@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>🦅 Eparviers - Projet Nana</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    form {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .card {
+      background: white;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-left: 4px solid #007bff;
+      box-shadow: 0 0 5px rgba(0,0,0,0.05);
+      position: relative;
+    }
+    .delete-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 5px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🦅 Observations d'Eparviers</h1>
+
+  <form id="eparvierForm">
+    <label>Nom</label>
+    <input type="text" name="nom" required>
+
+    <label>Espèce</label>
+    <input type="text" name="espece" required>
+
+    <label>Localisation</label>
+    <input type="text" name="localisation">
+
+    <label>Notes</label>
+    <textarea name="notes" rows="3"></textarea>
+
+    <button type="submit">Ajouter</button>
+  </form>
+
+  <div id="listeEparviers"></div>
+
+  <script>
+    const form = document.getElementById('eparvierForm');
+    const liste = document.getElementById('listeEparviers');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      await fetch('/eparviers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      form.reset();
+      chargerEparviers();
+    });
+
+    async function chargerEparviers() {
+      const res = await fetch('/eparviers');
+      const eparviers = await res.json();
+      liste.innerHTML = '';
+      eparviers.forEach(e => {
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.innerHTML = `
+          <strong>${e.nom}</strong> (${e.espece})<br>
+          📍 ${e.localisation || '—'}<br>
+          📝 ${e.notes || '—'}<br>
+          📅 ${new Date(e.dateObservation).toLocaleDateString()}
+          <button class="delete-btn" onclick="supprimerEparvier('${e._id}')">🗑</button>
+        `;
+        liste.appendChild(div);
+      });
+    }
+
+    async function supprimerEparvier(id) {
+      if (confirm('Supprimer cette observation ?')) {
+        await fetch(`/eparviers/${id}`, { method: 'DELETE' });
+        chargerEparviers();
+      }
+    }
+
+    chargerEparviers();
+  </script>
+
+</body>
+</html>
